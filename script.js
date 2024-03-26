@@ -2,6 +2,7 @@ const gridItems = document.querySelectorAll('.tttGridItem');
 let winnerHeading = document.getElementById(`winnerHeading`);
 let winner;
 let playerTurn = true;
+let gameOver = false;
 function winningPlayer(marker, playerName, combo) {
     const [a, b, c] = combo;
     if (gridItems[a].textContent == marker &&
@@ -40,7 +41,7 @@ function checkForDraw(){
     }
 }
 function setMarker(gridItem) {
-    if (!gridItem.textContent) {
+    if (!gridItem.textContent && !gameOver) {
         if (playerTurn) {
             gridItem.textContent = 'X';
         } else {
@@ -50,6 +51,10 @@ function setMarker(gridItem) {
         checkForWinner();
         checkForDraw();
         winnerHeading.textContent = winner;
+
+        if (winner || gameOver) {
+            gameOver = true;
+            gridItems.forEach(item => item.removeAttribute('onclick'));
+        }
     }
 }
-

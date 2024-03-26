@@ -30,6 +30,7 @@ body{
     align-items: center;
     font-size: 6rem;
     font-weight: bold;
+    user-select: none;
 }
 .container {
     display: flex;
