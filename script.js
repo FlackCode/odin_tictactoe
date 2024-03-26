@@ -1,60 +1,50 @@
-const gridItems = document.querySelectorAll('.tttGridItem');
-let winnerHeading = document.getElementById(`winnerHeading`);
-let winner;
-let playerTurn = true;
+let tText = document.getElementById(`tText`);
+let restartBtn = document.getElementById(`restartBtn`);
+restartBtn.addEventListener(`click`, restartGame);
+let tiles = Array.from(document.getElementsByClassName(`box`));
+console.log(tiles);
+const playerMarker = `X`;
+const opponentMarker = `O`;
+let currentMarker = playerMarker;
 let gameOver = false;
-function winningPlayer(marker, playerName, combo) {
-    const [a, b, c] = combo;
-    if (gridItems[a].textContent == marker &&
-        gridItems[b].textContent == marker &&
-        gridItems[c].textContent == marker) {
-        winner = `${playerName} Won!`;
-        return winner;
+let spaces = Array(9).fill(null);
+const startGame = () => {
+    tiles.forEach(tile => tile.addEventListener(`click`, tileClicked));
+}
+function tileClicked(box){
+    const id = box.target.id;
+    if(!spaces[id]){
+        spaces[id] = currentMarker;
+        box.target.innerText = currentMarker;
+        if(playerWon() !==false){
+            tText.innerHTML = `${currentMarker} has won.`;
+            gameOver = true;
+            tiles.forEach(tile => tile.removeEventListener(`click`, tileClicked));
+            return;
+        }
+        currentMarker = currentMarker == playerMarker ? opponentMarker : playerMarker;
     }
 }
-function checkForWinner() {
-    const winCombo = [
+function playerWon(){
+    const winTileCombo = [
         [0, 1, 2], [3, 4, 5], [6, 7, 8],
         [0, 3, 6], [1, 4, 7], [2, 5, 8],
         [0, 4, 8], [2, 4, 6]
     ];
-    for (let combo of winCombo) {
-        const result = winningPlayer(`X`, `Flack`, combo) || winningPlayer(`O`, `Player 2`, combo);
-        if (result) {
-            winner = result;
-            return winner;
+    for (let combo of winTileCombo){
+        let [a, b, c] = combo;
+        if(spaces[a] && (spaces[a] == spaces[b] && spaces[a] == spaces[c])){
+            return [a,b,c];
         }
     }
-    return null;
+    return false;
 }
-function checkForDraw(){
-    let isGridFull = true;
-    for(let gridItem of gridItems){
-        if(!gridItem.textContent.trim()){
-            isGridFull = false;
-            break;
-        }
-    }
-    if(isGridFull && !winner){
-        winner = `Draw!`;
-        return winner;
-    }
+function restartGame(){
+    spaces.fill(null);
+    tiles.forEach(tile => tile.innerText = ``);
+    tText.innerHTML = `Tic Tac Toe`;
+    currentMarker = playerMarker;
+    gameOver = false;
+    tiles.forEach(tile => tile.addEventListener(`click`, tileClicked));
 }
-function setMarker(gridItem) {
-    if (!gridItem.textContent && !gameOver) {
-        if (playerTurn) {
-            gridItem.textContent = 'X';
-        } else {
-            gridItem.textContent = 'O';
-        }
-        playerTurn = !playerTurn;
-        checkForWinner();
-        checkForDraw();
-        winnerHeading.textContent = winner;
-
-        if (winner || gameOver) {
-            gameOver = true;
-            gridItems.forEach(item => item.removeAttribute('onclick'));
-        }
-    }
-}
+startGame();
